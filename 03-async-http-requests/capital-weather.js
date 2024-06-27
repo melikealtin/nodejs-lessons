@@ -1,10 +1,7 @@
 const axios = require('axios');
 require('dotenv').config();
-const yargs = require('yargs')
 
 const apiKey = process.env.OPENWEATHERMAP_API_KEY;
-
-
 
 function findCapitalWeather(country) {
     

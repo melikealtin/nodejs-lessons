@@ -21,10 +21,6 @@ yargs.command({
   yargs.parse()
 
 
-
-
-
-
 // https
 //   .get("https://restcountries.com/v3.1/lang/turkish", (response) => {
 //     let data = "";

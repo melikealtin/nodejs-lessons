@@ -83,15 +83,14 @@ function showPerson(
 
 showPerson("melike", undefined, undefined, ["purple", "blue"]);
 
-
 const params = {
-    name: "melo",
-    age:25 ,
-    favoriteColors: ["purple, blue"]
-}
+  name: "melo",
+  age: 25,
+  favoriteColors: ["purple, blue"],
+};
 
-showUser(params) 
+showUser(params);
 
-function showUser({name = "unknown", favoriteColors = [] , age=0 }){
-    console.log(name + " " +age);
+function showUser({ name = "unknown", favoriteColors = [], age = 0 }) {
+  console.log(name + " " + age);
 }
