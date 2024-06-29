@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PDF Converter</title>
+  </head>
+  <body>
+    <form id="pdf-form">
+      <textarea id="html-content" rows="10" cols="30"></textarea>
+      <button type="submit">Create PDF</button>
+    </form>
+
+    <script>
+      document
+        .getElementById("pdf-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          const htmlContent = document.getElementById("html-content").value;
+
+          const response = await fetch("/create-pdf", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ htmlContent }),
+          });
+
+          if (response.ok) {
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "document.pdf";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+          } else {
+            alert("Error creating PDF");
+          }
+        });
+    </script>
+  </body>
+</html>
