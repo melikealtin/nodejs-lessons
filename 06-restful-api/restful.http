@@ -1,0 +1,53 @@
+# @BASE_URL = http://localhost:3000/
+
+# GET {{BASE_URL}}
+
+# ###
+# GET {{BASE_URL}}12?sortBy=name
+
+# ###
+# POST {{BASE_URL}}
+# Content-Type: application/json
+
+# {
+#     "name": "melo",
+#     "age": 25
+# }
+
+# ###
+# POST {{BASE_URL}}
+# Content-Type: application/x-www-form-urlencoded
+
+# name=melo&age=25
+
+@BASE_URL = http://localhost:3000/api 
+
+GET {{BASE_URL}}
+
+###
+GET {{BASE_URL}}/users 
+###
+GET {{BASE_URL}}/users/2 
+###
+POST {{BASE_URL}}/users
+Content-Type: application/json
+
+{
+    "name": "nunu",
+    "email": "nunu@gmail.com",
+    "userName": "nunu",
+    "password": "123456"
+}
+
+###
+PATCH  {{BASE_URL}}/users/668fc92a64c754b11362b3c0
+Content-Type: application/json
+
+{
+    "name": "melo",
+    "userName": "melikealtin"
+}
+###
+DELETE  {{BASE_URL}}/users/668fca067f31360f45d842e8
+Content-Type: application/json
+
