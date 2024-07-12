@@ -1,15 +1,18 @@
 const errorCatcher = (err, req, res, next) => {
-
-  if (err.name === "CastError") {
-    res.json({
-      message: "please give a valid id",
-    });
-  } else {
-    res.status(err.errorCode).json({
-      message: err.message,
-      errorCode: err.errorCode
-    });
+  console.log(err);
+  
+  if(err.code === 11000) {
+    return res.json(
+      {
+        message: Object.keys(err.keyValue) + " value you entered cannot be added/updated because it has already been in the database once before, it must be unique",
+        errorCode: 400
+      }
+    )
   }
+  res.json({
+    errorCode: err.statusCode,
+    message: err.message,
+  });
 };
 
 module.exports = errorCatcher;

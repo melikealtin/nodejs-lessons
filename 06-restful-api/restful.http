@@ -34,18 +34,17 @@ Content-Type: application/json
 
 {
     "name": "melo",
-    "email": "melo@gmail.com",
-    "userName": "melos",
+    "email": "melosadsa",
+    "userName": "medadsssa",
     "password": "123456"
 }
 
 ###
-PATCH  {{BASE_URL}}/users/668fc92a64c754b11362b3c0
+PATCH  {{BASE_URL}}/users/6691808c392963f39faae275
 Content-Type: application/json
 
 {
-    "name": "melo",
-    "userName": "melikealtin"
+    "userName": "meloss"
 }
 ###
 DELETE  {{BASE_URL}}/users/66917ac0f4b85fd05fb4a46b
