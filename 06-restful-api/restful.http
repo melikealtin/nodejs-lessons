@@ -33,9 +33,9 @@ POST {{BASE_URL}}/users
 Content-Type: application/json
 
 {
-    "name": "nunu",
-    "email": "nunu@gmail.com",
-    "userName": "nunu",
+    "name": "melo",
+    "email": "melo@gmail.com",
+    "userName": "melos",
     "password": "123456"
 }
 
@@ -48,6 +48,6 @@ Content-Type: application/json
     "userName": "melikealtin"
 }
 ###
-DELETE  {{BASE_URL}}/users/668fca067f31360f45d842e8
+DELETE  {{BASE_URL}}/users/66917ac0f4b85fd05fb4a46b
 Content-Type: application/json
 

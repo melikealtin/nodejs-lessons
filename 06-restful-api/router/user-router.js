@@ -43,7 +43,7 @@ router.patch("/:id", async (req, res) => {
 
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
 
   try {
     const result = await User.findByIdAndDelete({ _id: req.params.id });
@@ -53,12 +53,18 @@ router.delete("/:id", async (req, res) => {
         message: "user deleted",
       });
     } else {
-      return res.status(404).json({
-        message: "user could not be found and deleted",
-      });
+
+      const errorObject =  new Error("user could not be found")
+      errorObject.errorCode = 404
+
+      throw errorObject 
+      // return res.status(404).json({
+      //   message: "user could not be found and deleted",
+      // });
     }
-  } catch (err) {
-    console.log("delete error", err);
+  } catch (e) {
+
+     next(e)
   }
   
 });
