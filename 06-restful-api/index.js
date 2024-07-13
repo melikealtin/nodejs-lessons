@@ -17,6 +17,21 @@ app.get('/', (req,res) => {
 
 app.use(errorHandler)
 
+///use bcrypt for password
+// const bcrypt = require('bcrypt')
+
+// const test = async () => {
+//   const password ="melo"
+//   const hashPassword = await bcrypt.hash(password,10)
+
+//   console.log(password, hashPassword);
+  
+//   const result = await bcrypt.compare("meloo", hashPassword)
+//   console.log(result); 
+// }
+
+// test()
+
 // app.get('/:id', (req,res) => {
 //   console.log(req.query.sortBy);
 //   res.status(200).json({'id':req.params.id})

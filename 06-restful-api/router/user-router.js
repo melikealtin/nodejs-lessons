@@ -1,6 +1,7 @@
 const router = require("express").Router();
 const User = require("../models/user-model");
-var createError = require("http-errors");
+const createError = require("http-errors");
+const bcrypt = require('bcrypt')
 
 router.get("/", async (req, res) => {
   const allUsers = await User.find({});
@@ -19,6 +20,7 @@ router.post("/", async (req, res, next) => {
   
   try {
     const user = new User(req.body);
+    user.password = await bcrypt.hash(user.password,10)
 
     const { error, value } = user.validation(req.body);
     if (error) {
@@ -35,25 +37,37 @@ router.post("/", async (req, res, next) => {
 });
 
 router.patch("/:id", async (req, res, next) => {
+  delete req.body.createdAt;
+  delete req.body.updatedAt;
 
-  try {
-    const result = await User.findByIdAndUpdate(
-      { _id: req.params.id },
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    );
-    if (result) {
-      return res.json(result);
-    } else {
-      return next(createError(404, "User could not be found"));
-    }
-  } catch (e) {
-    next(createError(400, e));
+  if(req.body.hasOwnProperty('password')) {
+    req.body.password = await bcrypt.hash(req.body.password, 10)
   }
 
+  const { error, value } = User.validationForUpdate(req.body);
+  if (error) {
+    next(createError(400, error));
+  } else {
+    try {
+      const result = await User.findByIdAndUpdate(
+        { _id: req.params.id },
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      if (result) {
+        return res.json(result);
+      } else {
+        return res.status(404).json({
+          message: "user could not found",
+        });
+      }
+    } catch (e) {
+      next(e);
+    }
+  }
 });
 
 router.delete("/:id", async (req, res, next) => {

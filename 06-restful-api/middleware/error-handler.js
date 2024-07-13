@@ -9,6 +9,14 @@ const errorCatcher = (err, req, res, next) => {
       }
     )
   }
+  if(err.code == 66) {
+    return res.json({
+      message: "you tried to update an unchangeable area",
+      errorCode: 400
+    })
+  }
+  
+  res.status(err.statusCode || 500)
   res.json({
     errorCode: err.statusCode,
     message: err.message,

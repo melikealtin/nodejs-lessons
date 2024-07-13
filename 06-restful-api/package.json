@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "bcrypt": "^5.1.1",
     "express": "^4.19.2",
     "http-errors": "^2.0.0",
     "mongoose": "^8.5.0"
