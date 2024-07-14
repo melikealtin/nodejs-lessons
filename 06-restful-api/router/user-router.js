@@ -3,8 +3,9 @@ const User = require("../models/user-model");
 const createError = require("http-errors");
 const bcrypt = require('bcrypt')
 const authHandler = require('../middleware/auth-handler')
+const adminHandler = require('../middleware/admin-handler')
 
-router.get("/", async (req, res) => {
+router.get("/", [authHandler, adminHandler], async (req, res) => {
   const allUsers = await User.find({});
   res.json(allUsers);
 });
@@ -100,7 +101,7 @@ router.patch("/:id", async (req, res, next) => {
   if (error) {
     next(createError(400, error));
   } else {
-    
+
     try {
       const result = await User.findByIdAndUpdate(
         { _id: req.params.id },
@@ -123,7 +124,31 @@ router.patch("/:id", async (req, res, next) => {
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/me", authHandler, async (req, res, next) => {
+
+  try {
+    const result = await User.findByIdAndDelete({ _id: req.user._id });
+
+    if (result) {
+      return res.json({
+        message: "user deleted",
+      });
+    } else {
+      // const errorObject = new Error("user could not be found");
+      // errorObject.errorCode = 404;
+
+      throw createError(404, "user could not be found");
+      // return res.status(404).json({
+      //   message: "user could not be found and deleted",
+      // });
+    }
+  } catch (e) {
+    next(createError(400, e));
+  }
+  
+});
+
+router.delete("/:id", [authHandler,adminHandler], async (req, res, next) => {
 
   try {
     const result = await User.findByIdAndDelete({ _id: req.params.id });
@@ -131,6 +156,30 @@ router.delete("/:id", async (req, res, next) => {
     if (result) {
       return res.json({
         message: "user deleted",
+      });
+    } else {
+      // const errorObject = new Error("user could not be found");
+      // errorObject.errorCode = 404;
+
+      throw createError(404, "user could not be found");
+      // return res.status(404).json({
+      //   message: "user could not be found and deleted",
+      // });
+    }
+  } catch (e) {
+    next(createError(400, e));
+  }
+  
+});
+
+router.get("/deleteAll", [authHandler, adminHandler],  async (req, res, next) => {
+
+  try {
+    const result = await User.deleteMany({isAdmin:false})
+
+    if (result) {
+      return res.json({
+        message: "all users deleted",
       });
     } else {
       // const errorObject = new Error("user could not be found");
