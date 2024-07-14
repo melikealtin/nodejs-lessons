@@ -1,6 +1,8 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const Joi = require('@hapi/joi')
+const createError = require("http-errors");
+const bcrypt = require('bcrypt');
 
 const UserSchema = new Schema({
     name: {
@@ -29,6 +31,7 @@ const UserSchema = new Schema({
     password: {
         type:String,
         required:true,
+        minlength:6,
         trim:true,
     }
 }, {collection:"users", timestamps:true })
@@ -37,7 +40,7 @@ const schema = Joi.object({
     name: Joi.string().min(3).max(50).trim(),
     userName: Joi.string().min(3).max(50).trim(),
     email: Joi.string().trim().email(),
-    password: Joi.string().trim()
+    password: Joi.string().min(6).trim()
 })
 
 //for create user
@@ -45,8 +48,30 @@ UserSchema .methods.validation = function(userObject) {
     return schema.required().validate(userObject);
 }
 
+UserSchema.statics.login = async (email, password) => {
+    
+    const {error, value } = schema.validate({email, password})
+    if(error) {
+        throw createError(400, error)
+    }
+
+    const user = await User.findOne({email})
+
+    if(!user) {
+        throw createError(400, "e-mail and password incorrect")
+    }
+
+    const passwordControl = await bcrypt.compare(password, user.password)
+
+    if(!passwordControl) {
+        throw createError(400, "e-mail and password incorrect")
+    }
+
+    return user
+}
+
 //for update user
-UserSchema .statics.validationForUpdate = function(userObject) {
+UserSchema.statics.validationForUpdate = function(userObject) {
     return schema.validate(userObject)
 }
 

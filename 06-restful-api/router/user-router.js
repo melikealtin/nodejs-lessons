@@ -36,6 +36,21 @@ router.post("/", async (req, res, next) => {
 
 });
 
+
+router.post('/login', async (req, res, next) => {
+
+  try {
+    const user = await User.login(req.body.email, req.body.password)
+    res.json(user)
+    
+  } catch(error) {
+    next(error)
+  }
+
+})
+
+
+
 router.patch("/:id", async (req, res, next) => {
   delete req.body.createdAt;
   delete req.body.updatedAt;

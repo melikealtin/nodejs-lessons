@@ -33,18 +33,27 @@ POST {{BASE_URL}}/users
 Content-Type: application/json
 
 {
-    "name": "melo",
-    "email": "melosadsa",
-    "userName": "medadsssa",
-    "password": "123456"
+    "name": "melo12",
+    "userName": "melo12",
+    "email": "melo12@gmail.com",
+    "password": "sdasd"
 }
 
 ###
-PATCH  {{BASE_URL}}/users/6691808c392963f39faae275
+POST {{BASE_URL}}/users/login
 Content-Type: application/json
 
 {
-    "userName": "meloss"
+    "email": "melo12@gmail.com",
+    "password": "sdas"
+}
+
+###
+PATCH  {{BASE_URL}}/users/
+Content-Type: application/json
+
+{
+    "password": "asdsad"
 }
 ###
 DELETE  {{BASE_URL}}/users/66917ac0f4b85fd05fb4a46b
