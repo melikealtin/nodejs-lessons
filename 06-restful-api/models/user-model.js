@@ -3,6 +3,7 @@ const Schema = mongoose.Schema
 const Joi = require('@hapi/joi')
 const createError = require("http-errors");
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 const UserSchema = new Schema({
     name: {
@@ -43,8 +44,15 @@ const schema = Joi.object({
     password: Joi.string().min(6).trim()
 })
 
+UserSchema.methods.generateToken = async function () {
+    const loginUser = this;
+    const token = await jwt.sign({_id: loginUser.id}, 'secretkey', {expiresIn:'1h'})
+   
+    return token
+}
+
 //for create user
-UserSchema .methods.validation = function(userObject) {
+UserSchema.methods.validation = function(userObject) {
     return schema.required().validate(userObject);
 }
 

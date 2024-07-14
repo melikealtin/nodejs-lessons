@@ -2,18 +2,52 @@ const router = require("express").Router();
 const User = require("../models/user-model");
 const createError = require("http-errors");
 const bcrypt = require('bcrypt')
+const authHandler = require('../middleware/auth-handler')
 
 router.get("/", async (req, res) => {
   const allUsers = await User.find({});
   res.json(allUsers);
 });
 
-router.get("/:id", (req, res, next) => {
+router.get("/me",  authHandler, (req, res, next) => {
+      res.json(req.user)
+});
 
-  res.json({
-    message: "The user with id " + req.params.id + " will be listed",
-  });
+router.patch("/me", authHandler, async (req, res, next) => {
 
+  delete req.body.createdAt;
+  delete req.body.updatedAt;
+
+  if(req.body.hasOwnProperty('password')) {
+    req.body.password = await bcrypt.hash(req.body.password, 10)
+  }
+
+  const { error, value } = User.validationForUpdate(req.body);
+  if (error) {
+    next(createError(400, error));
+  } else {
+
+    try {
+      const result = await User.findByIdAndUpdate(
+        { _id: req.user._id },
+        req.body,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+      if (result) {
+        return res.json(result);
+      } else {
+        return res.status(404).json({
+          message: "user could not found",
+        });
+      }
+    } catch (e) {
+      next(e);
+    }
+  }
+  
 });
 
 router.post("/", async (req, res, next) => {
@@ -41,7 +75,10 @@ router.post('/login', async (req, res, next) => {
 
   try {
     const user = await User.login(req.body.email, req.body.password)
-    res.json(user)
+    const token = await user.generateToken()
+    res.json({
+      user,token
+    })
     
   } catch(error) {
     next(error)
@@ -50,8 +87,8 @@ router.post('/login', async (req, res, next) => {
 })
 
 
-
 router.patch("/:id", async (req, res, next) => {
+
   delete req.body.createdAt;
   delete req.body.updatedAt;
 
@@ -63,6 +100,7 @@ router.patch("/:id", async (req, res, next) => {
   if (error) {
     next(createError(400, error));
   } else {
+    
     try {
       const result = await User.findByIdAndUpdate(
         { _id: req.params.id },
