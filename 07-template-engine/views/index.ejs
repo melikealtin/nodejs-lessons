@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EJS Index</title>
+  </head>
+  <body>
+
+    <%-  include('_header') %>
+
+    <h1>EJS Index</h1>
+    <h2><%= age %></h2>
+    <h2><%= lesson %></h2>
+    <h2><%= colors %></h2>
+    <h2><%- colors %></h2>
+
+    <%- content %>
+
+    <h3>ad: <%= people[0].name %> id: <%= people[0].id %></h3>
+
+    <ul>
+      <% people.forEach(element => { %>
+      <li><%= element.name %></li>
+      <% }); %>
+    </ul>
+
+    <ul>
+      <% for (let index = 0; index < people.length; index++) { %>
+      <li><%= people[index].name %> id: <%= people[index].id %></li>
+
+      <% } %>
+    </ul>
+
+    <% if (age < 30) { %>
+    <h1>age less than 30</h1>
+    <% } else { %>
+    <h1>age older than 30</h1>
+    <% } %>
+
+    <%- include('_footer', {email:'test@test.com'}) %>
+  </body>
+</html>
