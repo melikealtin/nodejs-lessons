@@ -12,10 +12,14 @@ import { io } from 'socket.io-client';
 
 const message = ref('');
 const socketId = ref('');
-const socket = io('http://localhost:3000'); 
+const token = 'JWT_TOKEN'; 
+const socket = io('http://localhost:3000', {
+  auth: {
+    token
+  }
+}); 
 
 onMounted(() => {
-
   socket.on('connect', () => {
     socketId.value = socket.id;
   });
@@ -23,10 +27,13 @@ onMounted(() => {
   socket.on('message', (data) => {
     message.value = data;
   });
+
+  socket.on('connect_error', (err) => {
+    console.log(err.message); 
+  });
 });
 
 onUnmounted(() => {
-
   socket.disconnect();
 });
 </script>

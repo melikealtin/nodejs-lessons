@@ -12,6 +12,7 @@
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "pinia": "^2.1.7",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
