@@ -1,0 +1,55 @@
+<% 
+  function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  }
+  let tags = article.tags || article.tag_list || ''; 
+  if (typeof tags === 'string') {
+    tags = tags.split(','); 
+  }
+%>
+
+
+<div class="card">
+  <div class="card-image">
+    <figure class="image is-4by3">
+      <img src="<%= article.cover_image %>" alt="Cover image" />
+    </figure>
+  </div>
+
+  <div class="card-content">
+    <div class="media">
+      <div class="media-left">
+        <figure class="image is-48x48">
+          <img src="<%= article.user.profile_image  %>" alt="Placeholder image" />
+        </figure>
+      </div>
+      <div class="media-content">
+        <p class="title is-4"><%= article.user.name  %></p>
+        <p class="subtitle is-6">@<%= article.user.username %></p>
+      </div>
+    </div>
+    <div class="content fixed-height-content">
+
+      <%=  isDetailPage == true ? article.description :  article.description.slice(0, 50) %>
+      <% if (!isDetailPage && article.description.length > 50) { %>
+      <a href="/blog/article/<%= article.id %>">Devamını oku</a>
+      <% } %>
+
+      <br />
+
+      <% tags.forEach(function(tag) { %>
+      <a class="has-text-info" href="#">#<%= tag.trim() %></a>
+      <% }) %>
+      <br />
+
+      <% if (isDetailPage) { %>
+      <a class="has-text-success" href="<%= article.url %>"><%= article.url %></a>
+      <% } %>
+      <br />
+
+      <time datetime="<%= article.published_timestamp %>"><%= formatDate(article.published_at) %></time>
+    </div>
+
+  </div>
+</div>
