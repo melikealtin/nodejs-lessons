@@ -3,11 +3,17 @@
     <div class="card o-hidden border-0 shadow-lg my-5">
       <div class="card-body p-0">
         <div class="row">
-          <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+          <div class="col-lg-6 d-none d-lg-block bg-login-image">
+            <img src="https://images.unsplash.com/photo-1514517521153-1be72277b32f?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Register Image" class="img-fluid">
+          </div>
           <div class="col-lg-6">
             <div class="p-5">
               <div class="text-center">
                 <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                <% if (validation_error !== undefined && validation_error.length > 0 || locals.success_message != undefined || locals.login_error != undefined) { %>
+                <%- include('./partials/_message')  %>
+                <% } %>
+
               </div>
               <form class="user" action="/login" method="post">
                 <div class="form-group">

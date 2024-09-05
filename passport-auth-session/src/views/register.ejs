@@ -1,16 +1,21 @@
 <div class="card o-hidden border-0 shadow-lg my-5">
   <div class="card-body p-0">
     <div class="row">
-      <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+      <div class="col-lg-5 d-none d-lg-block bg-register-image">
+        <img src="https://images.unsplash.com/photo-1429087969512-1e85aab2683d?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Register Image" class="img-fluid">
+      </div>
       <div class="col-lg-7">
         <div class="p-5">
           <div class="text-center">
             <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
+            <% if (validation_error !== undefined && validation_error.length > 0) { %>
+            <%- include('./partials/_message')  %>
+            <% } %>
           </div>
           <form class="user" action="/register" method="post">
             <div class="form-group row">
               <div class="col-sm-6 mb-3 mb-sm-0">
-                <input type="text" name="firsName" class="form-control form-control-user" id="exampleFirstName" placeholder="First Name">
+                <input type="text" name="firstName" class="form-control form-control-user" id="exampleFirstName" placeholder="First Name">
               </div>
               <div class="col-sm-6">
                 <input type="text" name="lastName" class="form-control form-control-user" id="exampleLastName" placeholder="Last Name">

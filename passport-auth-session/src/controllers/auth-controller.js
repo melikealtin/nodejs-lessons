@@ -1,26 +1,78 @@
 const { validationResult } = require("express-validator");
+const User = require("../model/user-model");
+const passport = require("passport");
+require("../config/passport-local")(passport);
 
 const showLoginForm = (req, res, next) => {
   res.render("login", { layout: "./layout/auth-layout.ejs" });
 };
 
 const login = (req, res, next) => {
-  console.log(req.body);
-  res.render("login", { layout: "./layout/auth-layout.ejs" });
+  // console.log(req.body);
+
+  const errors = validationResult(req);
+
+  if (!errors.isEmpty()) {
+    req.flash("validation_error", errors.array());
+    req.flash("email", req.body.email);
+    req.flash("password", req.body.password);
+
+    res.redirect("/login");
+  }
+
+  passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/login",
+    failureFlash: true,
+  })(req, res, next);
 };
 
 const showRegisterForm = (req, res, next) => {
   res.render("register", { layout: "./layout/auth-layout.ejs" });
 };
 
-const register = (req, res, next) => {
+const register = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    res.render("register", {
-      layout: "./layout/auth-layout.ejs",
-      errors: errors.array(),
-    });
+    req.flash("validation_error", errors.array());
+    req.flash("email", req.body.email);
+    req.flash("firstName", req.body.firstName);
+    req.flash("lastName", req.body.lastName);
+    req.flash("password", req.body.password);
+    req.flash("repeatPassword", req.body.repeatPassword);
+
+    res.redirect("/register");
+  } else {
+    try {
+      const _user = await User.findOne({ email: req.body.email });
+
+      if (_user) {
+        req.flash("validation_error", [{ msg: "this mail is being used" }]);
+        req.flash("email", req.body.email);
+        req.flash("firstName", req.body.firstName);
+        req.flash("lastName", req.body.lastName);
+        req.flash("password", req.body.password);
+        req.flash("repeatPassword", req.body.repeatPassword);
+        res.redirect("/register");
+      } else {
+        const newUser = new User({
+          email: req.body.email,
+          firstName: req.body.firstName,
+          lastName: req.body.lastName,
+          password: req.body.password,
+        });
+
+        await newUser.save();
+        // console.log("user registered");
+
+        req.flash("success_message", [{ msg: "you can login" }]);
+        res.redirect("/login");
+      }
+    } catch (e) {
+      console.error(e);
+      res.redirect("/register");
+    }
   }
 };
 

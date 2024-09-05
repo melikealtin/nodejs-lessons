@@ -11,7 +11,7 @@ const validateNewUser = () => {
       .isLength({ max: 20 })
       .withMessage("password must be maximum 20 characters"),
 
-    body("firsName")
+    body("firstName")
       .trim()
       .isLength({ min: 2 })
       .withMessage("firstname must be at least 2 characters")
@@ -36,6 +36,20 @@ const validateNewUser = () => {
   ];
 };
 
+const validateLogin = () => {
+  return [
+    body("email").trim().isEmail().withMessage("enter a valid email"),
+
+    body("password")
+      .trim()
+      .isLength({ min: 6 })
+      .withMessage("password must be at least 6 characters")
+      .isLength({ max: 20 })
+      .withMessage("password must be maximum 20 characters"),
+  ];
+};
+
 module.exports = {
   validateNewUser,
+  validateLogin,
 };

@@ -2,8 +2,17 @@ const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
 const session = require("express-session");
+const flash = require("connect-flash");
+const passport = require("passport");
 
 require("./src/config/database");
+
+const MongoDBStore = require("connect-mongodb-session")(session);
+
+const sessionStore = new MongoDBStore({
+  uri: process.env.MONGODB_CONNECTION_STRING,
+  collection: "mySessions",
+});
 
 //session and flash message
 app.use(
@@ -12,15 +21,37 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
-      maxAge: 1000,
+      maxAge: 1000 * 60 * 60 * 24,
     },
+    store: sessionStore,
   })
 );
 
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.validation_error = req.flash("validation_error");
+  res.locals.success_message = req.flash("success_message");
+  res.locals.email = req.flash("email");
+  res.locals.firstName = req.flash("firstName");
+  res.locals.lastName = req.flash("lastName");
+  res.locals.password = req.flash("password");
+  res.locals.repeatPassword = req.flash("repeatPassword");
+
+  res.locals.login_error = req.flash("error");
+
+  next();
+});
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 const authRouter = require("./src/routers/auth-router");
+const adminPanelRouter = require("./src/routers/admin-router");
 
 //to read values from the form
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
 const ejs = require("ejs");
 const expressLayouts = require("express-ejs-layouts");
@@ -47,6 +78,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/", authRouter);
+app.use("/admin", adminPanelRouter);
 
 app.listen(process.env.PORT, () => {
   console.log(`The server started on port ${process.env.PORT}`);
