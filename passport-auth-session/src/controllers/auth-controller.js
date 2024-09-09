@@ -9,22 +9,22 @@ const showLoginForm = (req, res, next) => {
 
 const login = (req, res, next) => {
   // console.log(req.body);
-
   const errors = validationResult(req);
+
+  req.flash("email", req.body.email);
+  req.flash("password", req.body.password);
 
   if (!errors.isEmpty()) {
     req.flash("validation_error", errors.array());
-    req.flash("email", req.body.email);
-    req.flash("password", req.body.password);
 
     res.redirect("/login");
+  } else {
+    passport.authenticate("local", {
+      successRedirect: "/admin",
+      failureRedirect: "/login",
+      failureFlash: true,
+    })(req, res, next);
   }
-
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/login",
-    failureFlash: true,
-  })(req, res, next);
 };
 
 const showRegisterForm = (req, res, next) => {
@@ -85,6 +85,27 @@ const forgotPassword = (req, res, next) => {
   res.render("forgot-password", { layout: "./layout/auth-layout.ejs" });
 };
 
+const logout = async (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    req.session.destroy((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.clearCookie("connect.sid");
+      // req.flash("success_message", [{ msg: "successfully exited" }]);
+      // res.render("login", {
+      //   layout: "./layout/auth-layout.ejs",
+      //   success_message: [{ msg: "successfully exited" }],
+      // });
+      // res.send("exit made");
+      res.redirect("/login");
+    });
+  });
+};
+
 module.exports = {
   showLoginForm,
   showRegisterForm,
@@ -92,4 +113,5 @@ module.exports = {
   register,
   login,
   forgotPassword,
+  logout,
 };

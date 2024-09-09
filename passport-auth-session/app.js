@@ -5,6 +5,17 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const passport = require("passport");
 
+const ejs = require("ejs");
+const expressLayouts = require("express-ejs-layouts");
+const path = require("path");
+
+app.use(expressLayouts);
+app.use(express.static("public"));
+app.use("/admin", express.static(path.join(__dirname, "public")));
+
+app.set("view engine", "ejs");
+app.set("views", path.resolve(__dirname, "./src/views"));
+
 require("./src/config/database");
 
 const MongoDBStore = require("connect-mongodb-session")(session);
@@ -52,15 +63,6 @@ const adminPanelRouter = require("./src/routers/admin-router");
 //to read values from the form
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-const ejs = require("ejs");
-const expressLayouts = require("express-ejs-layouts");
-const path = require("path");
-
-app.use(expressLayouts);
-app.use(express.static("public"));
-app.set("view engine", "ejs");
-app.set("views", path.resolve(__dirname, "./src/views"));
 
 let counter = 0;
 
