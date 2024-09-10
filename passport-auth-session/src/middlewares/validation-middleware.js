@@ -49,7 +49,33 @@ const validateLogin = () => {
   ];
 };
 
+const validateEmail = () => {
+  return [body("email").trim().isEmail().withMessage("enter a valid email")];
+};
+
+const validateNewPassword = () => {
+  return [
+    body("password")
+      .trim()
+      .isLength({ min: 6 })
+      .withMessage("password must be at least 6 characters")
+      .isLength({ max: 20 })
+      .withMessage("password must be maximum 20 characters"),
+
+    body("repeatPassword")
+      .trim()
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error("passwords are not the same");
+        }
+        return true;
+      }),
+  ];
+};
+
 module.exports = {
   validateNewUser,
   validateLogin,
+  validateEmail,
+  validateNewPassword,
 };

@@ -35,10 +35,19 @@ router.get(
 router.post(
   "/forgot-password",
   authMiddleware.checkNotAuthenticated,
+  validatorMiddleware.validateEmail(),
   authController.forgotPassword
 );
 
 router.get("/verify", authController.verifyMail);
+
+router.get("/reset-password/:id/:token", authController.showNewPasswordForm);
+router.get("/reset-password", authController.showNewPasswordForm);
+router.post(
+  "/reset-password",
+  validatorMiddleware.validateNewPassword(),
+  authController.saveNewPassword
+);
 
 router.get("/logout", authController.logout);
 
