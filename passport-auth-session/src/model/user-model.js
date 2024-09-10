@@ -24,6 +24,10 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
     },
+    emailActive: {
+      type: Boolean,
+      default: false,
+    },
     password: {
       type: String,
       required: true,

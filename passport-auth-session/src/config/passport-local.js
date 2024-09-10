@@ -1,5 +1,6 @@
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("../model/user-model");
+const bcrypt = require("bcrypt");
 
 module.exports = function (passport) {
   const options = {
@@ -13,13 +14,20 @@ module.exports = function (passport) {
         const _user = await User.findOne({ email: email });
 
         if (!_user) {
-          return done(null, false, { message: "User not found" });
+          return done(null, false, { message: "user not found" });
         }
 
-        if (_user.password !== password) {
+        const passwordControl = await bcrypt.compare(password, _user.password);
+        if (!passwordControl) {
           return done(null, false, { message: "password incorrect" });
         } else {
-          return done(null, _user);
+          if (_user && _user.emailActive == false) {
+            return done(null, false, {
+              message: "please confirm your email",
+            });
+          } else {
+            return done(null, _user);
+          }
         }
       } catch (err) {
         return done(err);

@@ -2,6 +2,9 @@ const { validationResult } = require("express-validator");
 const User = require("../model/user-model");
 const passport = require("passport");
 require("../config/passport-local")(passport);
+const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
+const jwt = require("jsonwebtoken");
 
 const showLoginForm = (req, res, next) => {
   res.render("login", { layout: "./layout/auth-layout.ejs" });
@@ -47,7 +50,7 @@ const register = async (req, res, next) => {
     try {
       const _user = await User.findOne({ email: req.body.email });
 
-      if (_user) {
+      if (_user && _user.emailActive == true) {
         req.flash("validation_error", [{ msg: "this mail is being used" }]);
         req.flash("email", req.body.email);
         req.flash("firstName", req.body.firstName);
@@ -55,18 +58,67 @@ const register = async (req, res, next) => {
         req.flash("password", req.body.password);
         req.flash("repeatPassword", req.body.repeatPassword);
         res.redirect("/register");
-      } else {
+      } else if ((_user && _user.emailActive == false) || _user == null) {
+        if (_user) {
+          await User.findByIdAndDelete({ _id: _user._id });
+        }
+
         const newUser = new User({
           email: req.body.email,
           firstName: req.body.firstName,
           lastName: req.body.lastName,
-          password: req.body.password,
+          password: await bcrypt.hash(req.body.password, 10),
         });
 
         await newUser.save();
-        // console.log("user registered");
+        console.log("user registered");
 
-        req.flash("success_message", [{ msg: "you can login" }]);
+        //jwt
+        const jwtInformation = {
+          id: newUser.id,
+          mail: newUser.email,
+        };
+
+        const jwtToken = jwt.sign(
+          jwtInformation,
+          process.env.CONFIRM_MAIL_JWT_SECRET,
+          {
+            expiresIn: "1d",
+          }
+        );
+        console.log(jwtToken);
+
+        //mail send
+
+        const url = process.env.WEB_SITE_URL + "verify?id=" + jwtToken;
+        console.log("url: " + url);
+
+        let transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.GMAIL_USER,
+            pass: process.env.GMAIL_PASSWORD,
+          },
+        });
+
+        await transporter.sendMail(
+          {
+            from: "Nodejs app <info@nodejscourse.com",
+            to: newUser.email,
+            subject: "please confirm your email",
+            text: "please click on this link to confirm your email: " + url,
+          },
+          (error, info) => {
+            if (error) {
+              console.log("there is a error" + error);
+            }
+            console.log("mail sent");
+            console.log(info);
+            transporter.close();
+          }
+        );
+
+        req.flash("success_message", [{ msg: "please check your mailbox" }]);
         res.redirect("/login");
       }
     } catch (e) {
@@ -106,6 +158,43 @@ const logout = async (req, res, next) => {
   });
 };
 
+const verifyMail = (req, res, next) => {
+  const token = req.query.id;
+
+  if (token) {
+    try {
+      jwt.verify(
+        token,
+        process.env.CONFIRM_MAIL_JWT_SECRET,
+        async (e, decoded) => {
+          if (e) {
+            req.flash("error", "the code is incorrect or expired");
+            res.redirect("/login");
+          } else {
+            const tokenID = decoded.id;
+            const result = await User.findByIdAndUpdate(tokenID, {
+              emailActive: true,
+            });
+
+            if (result) {
+              req.flash("success_message", [
+                { msg: "mail successfully confirmed" },
+              ]);
+              res.redirect("/login");
+            } else {
+              req.flash("error", [{ msg: "please create a new user" }]);
+              res.redirect("/login");
+            }
+          }
+        }
+      );
+    } catch (err) {}
+  } else {
+    req.flash("error", "token is missing or invalid");
+    res.redirect("/login");
+  }
+};
+
 module.exports = {
   showLoginForm,
   showRegisterForm,
@@ -114,4 +203,5 @@ module.exports = {
   login,
   forgotPassword,
   logout,
+  verifyMail,
 };

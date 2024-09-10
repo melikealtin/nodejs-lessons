@@ -38,6 +38,8 @@ router.post(
   authController.forgotPassword
 );
 
+router.get("/verify", authController.verifyMail);
+
 router.get("/logout", authController.logout);
 
 module.exports = router;
