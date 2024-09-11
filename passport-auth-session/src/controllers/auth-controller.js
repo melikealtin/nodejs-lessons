@@ -280,17 +280,37 @@ const saveNewPassword = async (req, res, next) => {
 
     res.redirect("/reset-password/" + req.body.id + "/" + req.body.token);
   } else {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const result = await User.findByIdAndUpdate(req.body.id, {
-      password: hashedPassword,
+    const _foundUser = await User.findOne({
+      _id: req.body.id,
+      emailActive: true,
     });
+    const secret =
+      process.env.RESET_PASSWORD_JWT_SECRET + "-" + _foundUser.password;
 
-    if (result) {
-      req.flash("success_message", [{ msg: "password successfully updated" }]);
-      res.redirect("/login");
-    } else {
-      req.flash("error", [{ msg: "please create a new password" }]);
-      res.redirect("/login");
+    try {
+      jwt.verify(req.body.token, secret, async (e, decoded) => {
+        if (e) {
+          req.flash("error", "the code is incorrect or expired");
+          res.redirect("/forgot-password");
+        } else {
+          const hashedPassword = await bcrypt.hash(req.body.password, 10);
+          const result = await User.findByIdAndUpdate(req.body.id, {
+            password: hashedPassword,
+          });
+
+          if (result) {
+            req.flash("success_message", [
+              { msg: "password successfully updated" },
+            ]);
+            res.redirect("/login");
+          } else {
+            req.flash("error", [{ msg: "please create a new password" }]);
+            res.redirect("/login");
+          }
+        }
+      });
+    } catch (err) {
+      console.log("Error: " + err);
     }
   }
 };
