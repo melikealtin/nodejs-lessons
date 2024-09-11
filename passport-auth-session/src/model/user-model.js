@@ -24,6 +24,10 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
     },
+    avatar: {
+      type: String,
+      default: "default.png",
+    },
     emailActive: {
       type: Boolean,
       default: false,
